@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>canvas画板</title>
+    <style>
+        *{
+            margin:0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body{
+            overflow: hidden;
+            background-color: #f8a000;
+        }
+        ul,ol{
+            list-style:none;
+            background-color: #dddddd;
+        }
+        li{
+            width: 35px;
+            height: 35px;
+            text-align: center;
+        }
+        .op{
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        svg{
+            width: 25px;
+            height: 25px;
+            margin-top: 5px;
+            overflow: hidden;
+            vertical-align: middle;
+        }
+        li.active > svg{
+            width: 25px;
+            height: 25px;
+            margin-top: 5px;
+            overflow: hidden;
+            vertical-align: middle;
+        }
+        #all{
+            display: block;
+            width:100%;
+            height: -webkit-fill-available;
+        }
+        
+    </style>
+</head>
+<body>
+    <ol class="op">
+        <li class="pen">
+            <svg class="icon" aria-hidden="true">
+                <use xlink:href="#icon-pen"></use>
+            </svg>
+        </li>
+        <li class="eraser">
+            <svg class="icon" aria-hidden="true">
+                <use xlink:href="#icon-eraser"></use>
+            </svg>
+        </li>
+        <li class="clear">
+            <svg class="icon" aria-hidden="true">
+                <use xlink:href="#icon-clear"></use>
+            </svg>
+        </li>
+        <li class="save">
+            <svg class="icon" aria-hidden="true">
+                <use xlink:href="#icon-save"></use>
+            </svg>
+        </li>
+    </ol>
+    <canvas id="all" ></canvas>   
+    <script src="//at.alicdn.com/t/font_373426_ta160x3brso9wwmi.js"></script>
+    <script src="//at.alicdn.com/t/font_373426_g1g9scetyqwu3di.js"></script>
+    <script>
+       let li = document.querySelectorAll('li');
+       for(s=0;s<li.length;s++){
+           li[s].addEventListener('click',function(e){
+               let goal = e.currentTarget;
+               if(goal.classList[0] === 'pen' || goal.classList[0] === 'eraser'){
+                   goal.classList.add('active');
+                for(j=0;j<li.length;j++){
+                    if(li[j].classList[0] !== goal.classList[0]){
+                        li[j].classList.remove('active')
+                    }
+                }
+               }else if(goal.classList[0] === 'clear'){
+                context.clearRect(0,0,clientWidth,clientHeight)
+            }else if(goal.classList[0] === 'save'){
+                var canvas=document.getElementById("all");
+                var data=canvas.toDataURL("image/png");
+                var newWindow=window.open('about:blank','image from canvas');
+                newWindow.document.write("<img src='"+data+"' alt='from canvas'/>");
+               }
+           })
+       }
+       let canvas = document.querySelector('#all')
+       let clientWidth = document.documentElement.clientWidth
+       let clientHeight = document.documentElement.clientHeight
+       canvas.width = clientWidth
+       canvas.height = clientHeight
+       let context = canvas.getContext("2d")
+       let previousPoint
+       canvas.addEventListener('touchmove',function(e){
+           e.preventDefault();
+           let {pageX,pageY} = e.touches[0]
+           console.log(li[0].classList[1] === 'active')
+           if(li[0].classList[1] === 'active'){
+               if(previousPoint){
+                context.beginPath();
+                context.lineWidth = 5.0; 
+                   context.strokeStyle ='blue';
+                   context.beginPath();
+                   context.moveTo(previousPoint.pageX, previousPoint.pageY - 35); 
+                   context.lineTo(pageX,pageY - 35); 
+                   context.stroke()
+               }
+              previousPoint = { pageX, pageY }
+           }else if(li[1].classList[1] === 'active'){
+            context.clearRect(pageX - 5,pageY - 40, 15, 15)
+           }
+       })
+       canvas.addEventListener('touchend', function(){
+  previousPoint = null
+})
+    </script>
+</body>
+</html>
